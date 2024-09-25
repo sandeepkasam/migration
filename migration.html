@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offcanvas Popup</title>
+    <link rel="stylesheet" href="./progress-bar.css"> <!-- Include your CSS file -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Basic styles for the offcanvas */
+        .offcanvas {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: none; /* Initially hidden */
+        }
+
+        .offcanvas-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .offcanvas-body {
+            padding: 1rem;
+        }
+
+        .progress-bar-container {
+            background-color: #e9ecef;
+            height: 20px;
+            width: 100%;
+            border-radius: 5px;
+            display: block; /* Ensure it's visible initially */
+        }
+
+        .progress-bar {
+            background-color: #28a745;
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+            position: relative; /* Position relative to allow text to be inside */
+            display: flex;
+            align-items: center; /* Center the text vertically */
+            justify-content: center; /* Center the text horizontally */
+            color: white; /* White text inside the green progress bar */
+            font-weight: bold;
+        }
+
+        #progress-percentage {
+            position: absolute;
+            width: 100%;
+            text-align: center; /* Center the text in the bar */
+        }
+
+        #toggle-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #toggle-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #toggle-icon {
+            font-size: 16px;
+            margin-left: 5px; /* Space between the button and the icon */
+        }
+
+        .alert {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed; /* Fixed positioning */
+            bottom: 20px; /* Distance from bottom */
+            right: 20px; /* Distance from right */
+            z-index: 1000; /* Ensure it appears on top */
+            width: 250px; /* Set a width for the alert */
+        }
+
+        .alert-success {
+            background-color: #d4edda; /* Light green background */
+            color: #155724; /* Dark green text */
+            border: 1px solid #c3e6cb; /* Darker green border */
+        }
+
+        /* Centering the button */
+        .button-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full height of the viewport */
+        }
+
+        /* Button styles */
+        #start-btn {
+            background-color: #007bff; /* Primary blue color */
+            color: white; /* White text */
+            border: none;
+            padding: 10px 20px; /* Padding for the button */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 16px; /* Increase font size */
+            transition: background-color 0.3s; /* Smooth background color transition */
+        }
+
+        #start-btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Start Button -->
+    <div class="button-container">
+        <button id="start-btn">Start Migration</button>
+    </div>
+
+    <!-- Offcanvas Popup -->
+    <div id="offcanvas" class="offcanvas">
+        <div class="offcanvas-header">
+            <span class="icon"><i class="fa-solid fa-rocket"></i>  Migrating Data to selected environment</span> <!-- Replace with your icon -->
+            <button id="toggle-btn" class="toggle-btn">
+                <span id="toggle-icon">&#9660;</span> <!-- Dropdown icon -->
+            </button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar">
+                    <span id="progress-percentage">0%</span> <!-- Percentage text -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Success Alert Box -->
+    <div id="success-alert" class="alert alert-success" style="display: none;">
+        <i class="fa-solid fa-check"></i> success <br> Migration applied successfully
+    </div>
+
+    <script>
+        document.getElementById('start-btn').addEventListener('click', function () {
+            // Show the offcanvas popup
+            const offcanvas = document.getElementById('offcanvas');
+            offcanvas.style.display = 'block';
+
+            // Start the progress bar animation
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage'); // Get the span for percentage text
+
+            const interval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = progress + '%';
+                progressPercentage.textContent = progress + '%'; // Update the percentage text
+
+                // If progress reaches 100%, close the offcanvas and show an alert
+                if (progress === 100) {
+                    clearInterval(interval);
+                    offcanvas.style.display = 'none';
+                    // Show success alert
+                    const successAlert = document.getElementById('success-alert');
+                    successAlert.style.display = 'block'; // Show the alert box
+
+                    // Optionally hide the alert after a few seconds
+                    setTimeout(() => {
+                        successAlert.style.display = 'none';
+                    }, 3000); // Hides the alert after 3 seconds
+                }
+            }, 100); // Adjust speed by changing the interval time (100ms = 10 seconds to complete)
+        });
+
+        document.getElementById('toggle-btn').addEventListener('click', function () {
+            const offcanvas = document.getElementById('offcanvas');
+            const progressBarContainer = document.querySelector('.progress-bar-container');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            // Toggle visibility of the offcanvas and progress bar
+            if (progressBarContainer.style.display === 'none') {
+                progressBarContainer.style.display = 'block';
+                offcanvas.style.display = 'block';
+                toggleIcon.innerHTML = '&#9660;'; // Downward arrow (dropdown)
+            } else {
+                progressBarContainer.style.display = 'none';
+                toggleIcon.innerHTML = '&#9650;'; // Upward arrow (drop-up)
+            }
+        });
+    </script>
+</body>
+</html>
